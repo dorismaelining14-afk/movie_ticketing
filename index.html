@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Movie Ticketing</title>
+<style>
+body {
+    margin: 20;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(to right, black, red, black);
+    color: white;
+}
+/* NAVBAR */
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: white;
+    padding: 30px 60px;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 100px;
+}
+
+/* MOVIES ROW */
+.movies {
+    display: flex;
+    overflow-x: auto;
+    gap: 50px;
+    padding-bottom: 30px;
+}
+
+/* MOVIE CARD */
+.movie {
+    min-width: 220px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.movie img {
+    width: 220px;
+    height: 290px;
+    border-radius: 20px;
+}
+
+.movie:hover {
+    transform: scale(1.08);
+    box-shadow:0 0 15px rgba(229, 9, 20, 0.6);
+}
+
+.movie.selected {
+    border: 3px solid white;
+}
+
+/* SEATS */
+.seats {
+    margin-top: 20px;
+}
+
+.row {
+    margin: 5px;
+}
+
+.seat {
+    width: 40px;
+    height: 40px;
+    background: #444;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+.seat:hover {
+    background: #666;
+}
+
+.seat.selected {
+    background: green;
+}
+
+.seat.booked {
+    background: #222;
+    cursor: not-allowed;
+}
+
+/* INPUT + BUTTON */
+input {
+    padding: 10px;
+    margin-top: 20px;
+    width: 220px;
+    border-radius: 6px;
+    border: none;
+}
+
+button {
+    padding: 10px 25px;
+    margin-top: 15px;
+    background: white;
+    border: black;
+    color: black;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: gray;
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.7);
+}
+
+/* INFO TEXT */
+h3 {
+    color: #ccc;
+}
+
+/* TICKET POPUP */
+.ticket-popup {
+    background: white;
+    color: black;
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    border: 1px solid #e50914;
+}
+/* TICKET DESIGN */
+.ticket {
+    display: flex;
+    background: #fff;
+    color: #000;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+/* LEFT SIDE */
+.ticket-left {
+    padding: 20px;
+    width: 65%;
+}
+
+.ticket-left h2 {
+    margin-bottom: 10px;
+    color: #e50914;
+}
+
+/* CUT LINE */
+.ticket-cut {
+    width: 2px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #ccc,
+        #ccc 5px,
+        transparent 5px,
+        transparent 10px
+    );
+}
+
+/* RIGHT SIDE */
+.ticket-right {
+    width: 35%;
+    padding: 20px;
+    text-align: center;
+    background: #f5f5f5;
+}
+
+.ticket-right h3 {
+    margin-bottom: 10px;
+}
+
+/* POPUP */
+.ticket-popup {
+    background: rgba(0,0,0,0.8);
+    padding: 20px;
+    border-radius: 15px;
+    display: none;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1> MOVIES TO WATCH</h1>
+
+<div class="movies">
+
+<div class="movie" onclick="selectMovie('Avengers Endgame','Action','7:00 PM', this)">
+<img src="https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg">
+<p>Avengers</p>
+<small>Action | 7:00 PM</small>
+</div>
+
+<div class="movie" onclick="selectMovie('Spider-Man No Way Home','Action', '8:00 PM', this)">
+<img src="https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg">
+<p>Spider-Man</p>
+<small>Action | 8:00 PM</small>
+</div>
+
+<div class="movie" onclick="selectMovie('Avatar 2','Action', '6:00 PM', this)">
+<img src="https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg">
+<p>Avatar 2</p>
+<small>Action | 6:00 PM</small>
+</div>
+
+
+<div class="movie" onclick="selectMovie('Fast X','Action', '9:00 PM', this)">
+<img src="https://image.tmdb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclSiC.jpg">
+<p>Fast X</p>
+<small>Action | 9:00 PM</small>
+</div>
+
+
+<div class="movie" onclick="selectMovie('The Batman','Action', '10:00 PM', this)">
+<img src="https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg">
+<p>The Batman</p>
+<small>Action | 9:00 PM</small>
+</div>
+
+</div>
+
+
+<h2 id="seatSection">Select Seat</h2>
+<div class="seats" id="seatsContainer"></div>
+<h3 id="seatCount">Available Seats: --</h3>
+<h3 id="priceDisplay">Ticket Price: 0</h3>
+<h3 id="totalDisplay">Total: 0</h3>
+
+<input type="text" id="name" placeholder="Enter your name">
+
+<button onclick="bookTicket()">Book Ticket</button>
+
+<div class="ticket-popup" id="ticketPopup">
+
+    <div class="ticket">
+        
+        <!-- LEFT SIDE -->
+        <div class="ticket-left">
+            <h2>CINEMA TICKET</h2>
+            <p id="ticketMovie"></p>
+            <p id="ticketSeat"></p>
+            <p id="ticketPrice"></p>
+            <p id="ticketDate"></p>
+            <p id="ticketName"></p>
+        </div>
+
+        <!-- CUT LINE -->
+        <div class="ticket-cut"></div>
+
+        <!-- RIGHT SIDE -->
+        <div class="ticket-right">
+            <h3>ENJOY THE SHOW!</h3>
+            <p id="ticketMovieSmall"></p>
+            <p id="ticketSeatSmall"></p>
+            <p id="ticketTime"></p>
+        </div>
+
+    </div>
+
+    <button onclick="closeTicket()">Close</button>
+
+</div>
+
+<script>
+let selectedMovie = "";
+let selectedGenre = "";
+let selectedTime = "";
+let selectedSeats = []; // MULTIPLE
+
+
+let moviePrices = {
+    "Avengers Endgame": 250,
+    "Spider-Man No Way Home": 220,
+    "Avatar 2": 300,
+    "Fast X": 200,
+    "The Batman": 230
+};
+
+// Movie selection
+
+function selectMovie(movie, genre, time, element){
+    selectedMovie = movie;
+    selectedGenre = genre;
+    selectedTime = time;
+
+    document.querySelectorAll('.movie').forEach(m => m.classList.remove('selected'));
+    element.classList.add('selected');
+
+    selectedSeats = [];
+
+    document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+
+    loadBookedSeats(movie);
+
+    setTimeout(() => {
+    document.getElementById("seatSection").scrollIntoView({
+        behavior: "smooth"
+    });
+}, 200);
+
+    let price = moviePrices[movie];
+
+    document.getElementById("priceDisplay").innerText =
+        "Ticket Price: " + price;
+
+    document.getElementById("totalDisplay").innerText =
+        "Total: 0";
+}
+
+// Create seat layout
+let rows = ['A','B','C','D','E'];
+let seatsContainer = document.getElementById('seatsContainer');
+
+rows.forEach(row => {
+    let rowDiv = document.createElement('div');
+    rowDiv.classList.add('row');
+    for(let i=1; i<=6; i++){
+        let seatDiv = document.createElement('div');
+        seatDiv.classList.add('seat');
+        let seatNumber = row+i;
+        seatDiv.innerText = seatNumber;
+
+        seatDiv.addEventListener('click', function(){
+    if(seatDiv.classList.contains('booked')) return;
+
+    let seatNumber = seatDiv.innerText;
+
+    if(seatDiv.classList.contains('selected')){
+        seatDiv.classList.remove('selected');
+        selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+    } else {
+        seatDiv.classList.add('selected');
+        selectedSeats.push(seatNumber);
+    }
+
+    if(selectedMovie !== ""){
+        let price = moviePrices[selectedMovie];
+        let total = price * selectedSeats.length;
+
+        document.getElementById("totalDisplay").innerText =
+            "Total: " + total;
+    }
+});
+
+       
+        rowDiv.appendChild(seatDiv);
+    }
+    seatsContainer.appendChild(rowDiv);
+});
+
+// Load booked seats
+function loadBookedSeats(movie){
+    fetch('get_seats.php?movie=' + encodeURIComponent(movie))
+    .then(res => res.json())
+    .then(data => {
+
+        let totalSeats = 30;
+        let bookedCount = data.length;
+        let available = totalSeats - bookedCount;
+
+        document.getElementById("seatCount").innerText =
+            "Available Seats: " + available;
+
+        document.querySelectorAll('.seat').forEach(seat => {
+            seat.classList.remove('booked');
+            if(data.includes(seat.innerText)){
+                seat.classList.add('booked');
+            }
+        });
+    });
+}
+// Book ticket (AJAX)
+function bookTicket(){
+    let name = document.getElementById('name').value;
+
+    if(name==="" || selectedMovie==="" || selectedSeats.length===0){
+        alert("Complete all fields!");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append('name', name);
+    formData.append('movie', selectedMovie);
+
+    selectedSeats.forEach(seat => {
+        formData.append('seats[]', seat);
+    });
+
+    fetch('book.php', {method:'POST', body:formData})
+    .then(res => res.text())
+    .then(data => {
+
+        let currentMovie = selectedMovie;
+        loadBookedSeats(currentMovie);
+
+        let price = moviePrices[selectedMovie];
+        let total = price * selectedSeats.length;
+
+        document.getElementById('ticketName').innerText = "Name: "+name;
+        document.getElementById('ticketMovie').innerText =
+            "Movie: "+selectedMovie + " ("+selectedGenre+")";
+
+        document.getElementById('ticketSeat').innerText =
+            "Seats: "+selectedSeats.join(', ');
+
+        document.getElementById('ticketPrice').innerText =
+            "Time: " + selectedTime;
+
+        document.getElementById('ticketDate').innerText =
+            "Total Paid: " + total;
+
+        document.getElementById('ticketPopup').style.display = "block";
+
+        loadBookedSeats(selectedMovie);
+    });
+}
+function closeTicket(){
+
+    // Hide popup
+    document.getElementById('ticketPopup').style.display="none";
+
+    // Clear input field
+    document.getElementById('name').value = "";
+
+    // Clear selected seats
+    selectedSeats = [];
+
+    // Remove seat highlights
+    document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+
+    // Remove movie selection
+    selectedMovie = "";
+    document.querySelectorAll('.movie').forEach(m => m.classList.remove('selected'));
+
+    // Reset text displays
+    document.getElementById("totalDisplay").innerText = "Total: 0";
+    document.getElementById("priceDisplay").innerText = "Ticket Price: 0";
+}</script>
+
+</body>
+</html>
